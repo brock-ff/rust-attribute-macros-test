@@ -3,7 +3,6 @@ extern crate proc_macro2;
 
 use proc_macro2::{Span, Ident};
 use quote::quote;
-//use syn::*;
 
 #[proc_macro_attribute]
 pub fn async_route(
