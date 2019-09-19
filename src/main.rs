@@ -16,4 +16,6 @@ fn main() {
     println!("Hello, world!");
     let req = "OK".to_owned();
     do_function!(some_post_async, req);
+    let req = "OK".to_owned();
+    do_function!(some_post, req);
 }
