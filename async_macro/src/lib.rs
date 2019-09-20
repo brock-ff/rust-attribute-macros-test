@@ -1,5 +1,4 @@
 extern crate proc_macro;
-extern crate proc_macro2;
 
 use proc_macro2::{Span, Ident};
 use quote::quote;
@@ -12,16 +11,35 @@ pub fn async_route(
     // convert original TokenStream into proc_macro2 TokenStream
     let input = proc_macro2::TokenStream::from(item.clone());
     // output TokenStream; will contain original function and new _async function
-    let mut output: proc_macro2::TokenStream = { input };
-    println!("{}", item);
+    let mut output: proc_macro2::TokenStream = { input.clone() };
+
 
     // convert stream into iter and get its 1th element (fn name)
     let looky_stream = item.clone();
     let mut looky_iter = looky_stream.into_iter();
-    let f_token_tree = looky_iter.nth(1).unwrap();
+    
+    
+    let f_name_tree = looky_iter.nth(1).unwrap();
+    
+    let mut f_signature_tree_next = looky_iter.next();
+    let mut f_signature_stream = proc_macro::TokenStream::new();
+    
+    // iteratively build rest of function as a TokenStream
+    while f_signature_tree_next.is_some() {
+        // convert next iter item to TokenStream
+        let temp_stream = proc_macro::TokenStream::from(f_signature_tree_next.clone().unwrap());
+
+        // add "next" TokenStream to signature_stream
+        f_signature_stream.extend(temp_stream);
+
+        f_signature_tree_next = looky_iter.next();
+    }
+    // now we have the rest of the function signature & body in #f_signature_stream
+    // convert proc_macro::TokenStream into proc_macro2::TokenStream
+    let f_signature_stream2 = proc_macro2::TokenStream::from(f_signature_stream);
 
     // convert original fn name into an ident
-    let f_name = format!("{}", f_token_tree);
+    let f_name = format!("{}", f_name_tree);
     let ident = Ident::new(&f_name, Span::call_site());
 
     // append `_async` to ident, get eaten by new ident
@@ -31,9 +49,7 @@ pub fn async_route(
     // define output syntax; compile into TokenStream
     let new_f = quote! {
         // TODO: replace T & x with function signatures from OG TokenStream
-        fn #new_ident<T>(x: T) where T: std::fmt::Display {
-            println!("\"async\" thing triggered\n{}", x);
-        }
+        fn #new_ident #f_signature_stream2
     };
 
     // convert proc_macro2 TokenStream into OG TokenStream

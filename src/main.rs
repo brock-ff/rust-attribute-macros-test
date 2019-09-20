@@ -2,8 +2,10 @@ extern crate async_macro;
 use async_macro::*;
 
 #[async_route]
-fn some_post(req: String) {
-    println!("{}", req);
+fn some_post<T, U>(a: T, b: U) -> Result<(), ()> where T: std::fmt::Display, U: std::fmt::Debug {
+    println!("{}", a);
+    println!("{:?}", b);
+    Ok(())
 }
 
 macro_rules! do_function {
@@ -12,10 +14,19 @@ macro_rules! do_function {
     };
 }
 
+#[derive(Debug, Clone)]
+struct Test {
+    f: u64,
+}
+
 fn main() {
-    println!("Hello, world!");
-    let req = "OK".to_owned();
-    do_function!(some_post_async, req);
-    let req = "OK".to_owned();
-    do_function!(some_post, req);
+    let a = "wow such generics".to_owned();
+    let b = Test {
+        f: 64,
+    };
+
+    do_function!(some_post_async, a, b.clone()).unwrap();
+
+    let a = "OK".to_owned();
+    do_function!(some_post, a, b.clone()).unwrap();
 }
