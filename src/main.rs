@@ -20,13 +20,12 @@ struct Test {
 }
 
 fn main() {
-    let a = "wow such generics".to_owned();
+    let a = "this is called by some_post_async".to_owned();
     let b = Test {
         f: 64,
     };
-
     do_function!(some_post_async, a, b.clone()).unwrap();
 
-    let a = "OK".to_owned();
+    let a = "this is called by some_post (synchronous)".to_owned();
     do_function!(some_post, a, b.clone()).unwrap();
 }
