@@ -68,9 +68,8 @@ pub fn async_route(
     let new_ident = Ident::new(&format!("{}_async", ident), Span::call_site());
     println!("procedurally generated new function: {}", new_ident);
 
-    // define output syntax; compile into TokenStream
+    // define output body; compile into TokenStream with quote!
     let new_f = quote! {
-        // TODO: replace T & x with function signatures from OG TokenStream
         fn #new_ident #f_signature_stream2 {
             println!("Do this, then do whatever else it is that this function does...");
             #f_body_stream2
